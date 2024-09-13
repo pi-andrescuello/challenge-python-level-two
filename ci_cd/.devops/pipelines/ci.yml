@@ -1,0 +1,16 @@
+version: '2.0'
+
+jobs:
+  build:
+    docker:
+      - image: python:3.x
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            pip install -r requirements.txt
+      - run:
+          name: Run tests
+          command: |
+            pytest
