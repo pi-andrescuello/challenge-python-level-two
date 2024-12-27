@@ -1,11 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.routers.auth import AuthRouter
 from app.api.routers.character import CharacterRouter
 from app.api.routers.keyphrase import KeyphraseRouter
 
 # class for create app and send routes
 class CreateApp():
     app = FastAPI()
+    
+    auth_router = AuthRouter().router
     character_router = CharacterRouter().router
     keyphrase_router = KeyphraseRouter().router
 
@@ -18,5 +21,6 @@ class CreateApp():
             allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
             allow_headers=["*"],
         )
+        self.app.include_router(self.auth_router, prefix="/api")
         self.app.include_router(self.character_router, prefix="/api")
         self.app.include_router(self.keyphrase_router, prefix="/api")
