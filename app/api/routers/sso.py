@@ -1,8 +1,6 @@
-import os
 from fastapi import APIRouter, HTTPException
-from authlib.integrations.starlette_client import OAuth
 from fastapi.params import Depends
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 from starlette.requests import Request
 from app.core.sso import oauth
 

@@ -29,16 +29,59 @@ class CreateApp():
         # Middleware para manejar sesiones
         self.app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", ""))
 
+
+        @self.app.exception_handler(Exception)
+        async def custom_exception_handler(request: Request, exc: Exception):
+            response = JSONResponse(
+                content={"error": "Internal Server Error"},
+                status_code=500, 
+                headers={
+                    "Content-Type": "application/json",
+                    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+                    "X-Frame-Options": "SAMEORIGIN",
+                    "X-Content-Type-Options": "nosniff",
+                    "Referrer-Policy": "no-referrer",
+                    "Permissions-Policy": "geolocation=(), microphone=()",
+                    "Content-Security-Policy": "default-src 'self'"
+                }
+            )
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+            response.headers["X-Frame-Options"] = "SAMEORIGIN"
+            response.headers["X-Content-Type-Options"] = "nosniff"
+            response.headers["Referrer-Policy"] = "no-referrer"
+            response.headers["Permissions-Policy"] = "geolocation=(), microphone=()"
+            response.headers["Content-Security-Policy"] = "default-src 'self'"
+            return response
+
         # Middleware de autenticación
         @self.app.middleware("http")
         async def check_authentication(request: Request, call_next):
             try:
-                return await call_next(request)
+                response = await call_next(request)
+                response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+                response.headers["Content-Security-Policy"] = "default-src 'self'"
+                response.headers["X-Frame-Options"] = "SAMEORIGIN"
+                response.headers["X-Content-Type-Options"] = "nosniff"
+                response.headers["Referrer-Policy"] = "no-referrer"
+                response.headers["Permissions-Policy"] = "geolocation=(), microphone=()"
+                return response
             except Exception as e:
                 import traceback
                 print("Error en autenticación:", str(e))
                 print(traceback.format_exc())
-                return JSONResponse(status_code=500, content={"error": "Internal Server Error"})
+                return JSONResponse(
+                    status_code=500, 
+                    content={"error": "Internal Server Error"}, 
+                    headers={
+                        "Content-Type": "application/json",
+                        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+                        "X-Frame-Options": "SAMEORIGIN",
+                        "X-Content-Type-Options": "nosniff",
+                        "Referrer-Policy": "no-referrer",
+                        "Permissions-Policy": "geolocation=(), microphone=()",
+                        "Content-Security-Policy": "default-src 'self'"
+                    }
+                )
 
         self.app.include_router(self.sso_router, prefix="/auth")
         self.app.include_router(self.auth_router, prefix="/api")
