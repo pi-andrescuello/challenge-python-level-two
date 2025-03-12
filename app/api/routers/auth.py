@@ -17,7 +17,13 @@ class AuthRouter:
     @router.get('/auth')
     def get_auth(authorization: str = Header(...)):
         try:
-            return auth_token(authorization)
+            if not authorization or not authorization.startswith('Bearer '):
+                # JWT expired return error 401
+                raise HTTPException(
+                    401, detail='Fail of authorization of token')
+
+            hash_token = authorization.split(' ')[1]
+            return auth_token(hash_token)
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

@@ -3,6 +3,7 @@ from fastapi.params import Depends
 from app.db.repository.keyphrase import KeyphraseRepository
 from app.schemas.keyphrase import KeyphraseSchema
 from app.services.keyphrase_service import KeyphraseServices
+from app.core.jwt import verify_admin_token, verify_user_or_admin_token
 
 class KeyphraseRouter:
     router = APIRouter(
@@ -31,6 +32,7 @@ class KeyphraseRouter:
     @router.post('/keyphrase')
     def gpt_post_quetions(
             model: KeyphraseSchema,
+            token: str = Depends(verify_admin_token),
             repository: KeyphraseRepository = Depends()):
 
             service = KeyphraseServices(repository)
