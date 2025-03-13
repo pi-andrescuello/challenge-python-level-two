@@ -4,9 +4,9 @@ from fastapi.responses import RedirectResponse
 from starlette.requests import Request
 from app.core.sso import oauth
 
-class SSORouter:
+class SsoMicorosftRouter:
     router = APIRouter(
-        tags = ["Authentication"],
+        tags = ["SSO Misocorft"],
         responses = {
             404: { "description": "Not found" }
         },
@@ -27,7 +27,7 @@ class SSORouter:
             raise HTTPException(status_code=400, detail="Error al obtener la información del usuario")
         
         request.session["user"] = user_info
-        return RedirectResponse(url="/auth/protected")  # Redirige a una página protegida
+        return RedirectResponse(url="/v1/ms/protected")  # Redirige a una página protegida
 
     # Función para obtener usuario autenticado
     def get_current_user(request: Request):
@@ -46,3 +46,4 @@ class SSORouter:
     async def logout(request: Request):
         request.session.pop("user", None)
         return {"message": "Sesión cerrada"}
+    
